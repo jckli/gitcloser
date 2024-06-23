@@ -7,8 +7,8 @@ import (
 
 // implement a bidirectional bfs algorithm to find the shortest path between two nodes, which are startUser and endUser. strictly only go from startUser's following and recursively on to targetUser from targetUser's followers it should form a line like this: startUser -> people startUser follows/people following targetUser -> targetUser
 func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode, error) {
-	startNode := UserNode{Login: startUser, Visited: false}
-	endNode := UserNode{Login: endUser, Visited: false}
+	startNode := UserNode{Login: startUser, Prev: nil}
+	endNode := UserNode{Login: endUser, Prev: nil}
 
 	startQueue := []UserNode{startNode}
 	endQueue := []UserNode{endNode}
@@ -20,24 +20,28 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 	endVisited[endUser] = endNode
 
 	for len(startQueue) > 0 && len(endQueue) > 0 {
-		newSQ, err := bfs(startQueue, startVisited, "start", c)
+		newSQ, err := bfs(&startQueue, &startVisited, "start", c)
 		if err != nil {
 			return nil, err
 		}
 
-		newEQ, err := bfs(endQueue, endVisited, "end", c)
+		newEQ, err := bfs(&endQueue, &endVisited, "end", c)
 		if err != nil {
 			return nil, err
 		}
 
-		intersect, startNode, endNode := isIntersection(startVisited, endVisited)
+		intersect, startNode, endNode := isIntersection(&startVisited, &endVisited)
+		fmt.Println(intersect, startNode, endNode)
+
 		if intersect {
-			startPath := getPath(startNode)
-			endPath := getPath(endNode)
-			return append(startPath, endPath...), nil
+			startPath := getPath(&startNode)
+			fmt.Println(startPath)
+			endPath := getPath(&endNode)
+			fmt.Println(endPath)
+			return append(startPath, reversePath(endPath)...), nil
 		}
-		startQueue = newSQ
-		endQueue = newEQ
+		startQueue = *newSQ
+		endQueue = *newEQ
 
 	}
 
@@ -45,12 +49,12 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 }
 
 func bfs(
-	queue []UserNode,
-	visited map[string]UserNode,
+	queue *[]UserNode,
+	visited *map[string]UserNode,
 	direction string, c *fasthttp.Client,
-) ([]UserNode, error) {
-	node := queue[0]
-	queue = queue[1:]
+) (*[]UserNode, error) {
+	node := (*queue)[0]
+	*queue = (*queue)[1:]
 
 	if direction == "start" {
 		following, err := getUser(node.Login, "following", c)
@@ -59,11 +63,10 @@ func bfs(
 		}
 
 		for _, v := range following {
-			if !visited[v.Login].Visited {
-				queue = append(queue, v)
+			if _, exists := (*visited)[v.Login]; !exists {
 				v.Prev = &node
-				v.Visited = true
-				visited[v.Login] = v
+				(*visited)[v.Login] = v
+				*queue = append((*queue), v)
 			}
 		}
 	} else {
@@ -73,11 +76,10 @@ func bfs(
 		}
 
 		for _, v := range followers {
-			if !visited[v.Login].Visited {
-				queue = append(queue, v)
+			if _, exists := (*visited)[v.Login]; !exists {
 				v.Prev = &node
-				v.Visited = true
-				visited[v.Login] = v
+				(*visited)[v.Login] = v
+				*queue = append((*queue), v)
 			}
 		}
 	}
@@ -85,27 +87,21 @@ func bfs(
 	return queue, nil
 }
 
-func isIntersection(startVisited, endVisited map[string]UserNode) (bool, UserNode, UserNode) {
-	fmt.Println(startVisited)
-	fmt.Println(endVisited)
-	for k := range startVisited {
-		if endVisited[k].Visited {
-			return true, startVisited[k], endVisited[k]
+func isIntersection(startVisited, endVisited *map[string]UserNode) (bool, UserNode, UserNode) {
+	for k, v := range *startVisited {
+		if u, exists := (*endVisited)[k]; exists {
+			return true, v, u
 		}
 	}
 	return false, UserNode{}, UserNode{}
-
 }
 
-func getPath(node UserNode) []UserNode {
-	path := []UserNode{}
+func getPath(node *UserNode) []UserNode {
+	path := []UserNode{*node}
 	for node.Prev != nil {
-		path = append(path, node)
-		node = *node.Prev
+		path = append(path, *node.Prev)
+		node = node.Prev
 	}
-	path = append(path, node)
-	fmt.Println("path")
-	fmt.Println(path)
 	return path
 }
 

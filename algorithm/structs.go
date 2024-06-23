@@ -27,7 +27,6 @@ type UserNode struct {
 	AvatarUrl string `json:"avatarUrl"`
 	Url       string `json:"url"`
 	Prev      *UserNode
-	Visited   bool
 }
 
 type RateLimitResponse struct {
