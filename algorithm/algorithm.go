@@ -24,6 +24,7 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("newSQ", newSQ)
 
 		newEQ, err := bfs(&endQueue, &endVisited, "end", c)
 		if err != nil {
@@ -42,7 +43,6 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		}
 		startQueue = *newSQ
 		endQueue = *newEQ
-
 	}
 
 	return nil, fmt.Errorf("no path found")
@@ -88,6 +88,10 @@ func bfs(
 }
 
 func isIntersection(startVisited, endVisited *map[string]UserNode) (bool, UserNode, UserNode) {
+	fmt.Println(*startVisited)
+	fmt.Println("----")
+	fmt.Println(*endVisited)
+	fmt.Println("----")
 	for k, v := range *startVisited {
 		if u, exists := (*endVisited)[k]; exists {
 			return true, v, u
