@@ -24,7 +24,6 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("newSQ", newSQ)
 
 		newEQ, err := bfs(&endQueue, &endVisited, "end", c)
 		if err != nil {
@@ -36,10 +35,10 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 
 		if intersect {
 			startPath := getPath(&startNode)
-			fmt.Println(startPath)
+			reversePath(&startPath)
 			endPath := getPath(&endNode)
-			fmt.Println(endPath)
-			return append(startPath, reversePath(endPath)...), nil
+			// remove the first element of endPath because it's the same as the last element of startPath
+			return append(startPath, endPath[1:]...), nil
 		}
 		startQueue = *newSQ
 		endQueue = *newEQ
@@ -88,10 +87,6 @@ func bfs(
 }
 
 func isIntersection(startVisited, endVisited *map[string]UserNode) (bool, UserNode, UserNode) {
-	fmt.Println(*startVisited)
-	fmt.Println("----")
-	fmt.Println(*endVisited)
-	fmt.Println("----")
 	for k, v := range *startVisited {
 		if u, exists := (*endVisited)[k]; exists {
 			return true, v, u
@@ -109,10 +104,8 @@ func getPath(node *UserNode) []UserNode {
 	return path
 }
 
-func reversePath(path []UserNode) []UserNode {
-	reversed := make([]UserNode, len(path))
-	for i, v := range path {
-		reversed[len(path)-1-i] = v
+func reversePath(path *[]UserNode) {
+	for i := 0; i < len(*path)/2; i++ {
+		(*path)[i], (*path)[len(*path)-i-1] = (*path)[len(*path)-i-1], (*path)[i]
 	}
-	return reversed
 }
