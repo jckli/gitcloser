@@ -7,8 +7,47 @@ import (
 
 // implement a bidirectional bfs algorithm to find the shortest path between two nodes, which are startUser and endUser. strictly only go from startUser's following and recursively on to targetUser from targetUser's followers it should form a line like this: startUser -> people startUser follows/people following targetUser -> targetUser
 func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode, error) {
-	startNode := UserNode{Login: startUser, Prev: nil}
-	endNode := UserNode{Login: endUser, Prev: nil}
+
+	startUserInfo, err := getUser(startUser, "user", c)
+	if err != nil {
+		return nil, err
+	}
+
+	if startUserInfo[0].Following.TotalCount == 0 {
+		return nil, fmt.Errorf("no path found")
+	}
+
+	endUserInfo, err := getUser(endUser, "user", c)
+	if err != nil {
+		return nil, err
+	}
+
+	if endUserInfo[0].Followers.TotalCount == 0 {
+		return nil, fmt.Errorf("no path found")
+	}
+
+	startNode := UserNode{
+		Login:     startUser,
+		Prev:      nil,
+		AvatarUrl: startUserInfo[0].AvatarUrl,
+		Url:       startUserInfo[0].Url,
+	}
+	startNode.Following.TotalCount = startUserInfo[0].Following.TotalCount
+	startNode.Followers.TotalCount = startUserInfo[0].Followers.TotalCount
+	endNode := UserNode{
+		Login:     endUser,
+		Prev:      nil,
+		AvatarUrl: endUserInfo[0].AvatarUrl,
+		Url:       endUserInfo[0].Url,
+	}
+	endNode.Following.TotalCount = endUserInfo[0].Following.TotalCount
+	endNode.Followers.TotalCount = endUserInfo[0].Followers.TotalCount
+
+	for _, v := range startUserInfo[0].Following.Nodes {
+		if v.Login == endUser {
+			return []UserNode{startNode, endNode}, nil
+		}
+	}
 
 	startQueue := []UserNode{startNode}
 	endQueue := []UserNode{endNode}
@@ -20,6 +59,10 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 	endVisited[endUser] = endNode
 
 	for len(startQueue) > 0 && len(endQueue) > 0 {
+		fmt.Println(startQueue)
+		fmt.Println("-----")
+		fmt.Println(endQueue)
+		fmt.Println("-----")
 		newSQ, err := bfs(&startQueue, &startVisited, "start", c)
 		if err != nil {
 			return nil, err
@@ -37,7 +80,6 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 			startPath := getPath(&startNode)
 			reversePath(&startPath)
 			endPath := getPath(&endNode)
-			// remove the first element of endPath because it's the same as the last element of startPath
 			return append(startPath, endPath[1:]...), nil
 		}
 		startQueue = *newSQ

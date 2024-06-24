@@ -12,21 +12,22 @@ type GraphQlResponse struct {
 }
 
 type Data struct {
-	User struct {
-		Followers struct {
-			Nodes []UserNode `json:"nodes"`
-		} `json:"followers"`
-		Following struct {
-			Nodes []UserNode `json:"nodes"`
-		} `json:"following"`
-	} `json:"user"`
+	User UserNode `json:"user"`
 }
 
 type UserNode struct {
 	Login     string `json:"login"`
 	AvatarUrl string `json:"avatarUrl"`
 	Url       string `json:"url"`
-	Prev      *UserNode
+	Followers struct {
+		Nodes      []UserNode `json:"nodes"`
+		TotalCount int        `json:"totalCount"`
+	} `json:"followers"`
+	Following struct {
+		Nodes      []UserNode `json:"nodes"`
+		TotalCount int        `json:"totalCount"`
+	} `json:"following"`
+	Prev *UserNode
 }
 
 type RateLimitResponse struct {

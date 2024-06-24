@@ -25,6 +25,12 @@ func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error)
 						login
 						avatarUrl
 						url
+						followers {
+							totalCount
+						}
+						following {
+							totalCount
+						}
 					}
 				}
 			}
@@ -38,8 +44,40 @@ func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error)
 						login
 						avatarUrl
 						url
+						followers {
+							totalCount
+						}
+						following {
+							totalCount
+						}
 					}
 				}
+			}
+		}`, username)
+	} else if queryType == "user" {
+		query = fmt.Sprintf(`
+		query {
+			user(login: "%s") {
+				login
+				avatarUrl
+				followers(first: 100) {
+					nodes {
+						login
+						avatarUrl
+						url
+					}
+					totalCount
+				}
+				following(first: 100) {
+					nodes {
+						login
+						avatarUrl
+						url
+						
+					}
+					totalCount
+				}
+				url
 			}
 		}`, username)
 	} else {
@@ -77,8 +115,17 @@ func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error)
 
 	if queryType == "following" {
 		return respBody.Data.User.Following.Nodes, nil
-	} else {
+	} else if queryType == "followers" {
 		return respBody.Data.User.Followers.Nodes, nil
+	} else {
+		return []UserNode{{
+			Login:     respBody.Data.User.Login,
+			AvatarUrl: respBody.Data.User.AvatarUrl,
+			Url:       respBody.Data.User.Url,
+			Followers: respBody.Data.User.Followers,
+			Following: respBody.Data.User.Following,
+		}}, nil
+
 	}
 }
 
