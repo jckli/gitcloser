@@ -98,12 +98,19 @@ func bfs(
 	*queue = (*queue)[1:]
 
 	if direction == "start" {
-		following, err := getUser(node.Login, "following", c)
+		following, rateLimitFollowing, err := getUser(node.Login, "following", c)
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(rateLimitFollowing)
+		if rateLimitFollowing.Remaining == 0 {
+			return nil, fmt.Errorf(
+				"rate limit reached, try again in %d seconds",
+				rateLimitFollowing.Reset,
+			)
+		}
 
-		for _, v := range following {
+		for _, v := range *following {
 			if _, exists := (*visited)[v.Login]; !exists {
 				v.Prev = &node
 				(*visited)[v.Login] = v
@@ -111,12 +118,16 @@ func bfs(
 			}
 		}
 	} else {
-		followers, err := getUser(node.Login, "followers", c)
+		followers, rateLimitFollowers, err := getUser(node.Login, "followers", c)
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(rateLimitFollowers)
+		if rateLimitFollowers.Remaining == 0 {
+			return nil, fmt.Errorf("rate limit reached, try again in %d seconds", rateLimitFollowers.Reset)
+		}
 
-		for _, v := range followers {
+		for _, v := range *followers {
 			if _, exists := (*visited)[v.Login]; !exists {
 				v.Prev = &node
 				(*visited)[v.Login] = v

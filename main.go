@@ -10,6 +10,6 @@ import (
 
 func main() {
 	client := &fasthttp.Client{}
-	path, err := algorithm.FindShortestPath("jckli", "The-Brandon-Tran", client)
+	path, err := algorithm.FindShortestPath("jckli", "Vendicated", client)
 	fmt.Println(path, err)
 }

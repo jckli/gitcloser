@@ -46,3 +46,9 @@ type RateLimitResponse struct {
 		} `json:"rateLimit"`
 	} `json:"data"`
 }
+
+type RateLimitInfo struct {
+	Limit     int
+	Remaining int
+	Reset     int
+}

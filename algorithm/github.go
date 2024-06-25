@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/valyala/fasthttp"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -93,7 +94,7 @@ query ($username: String!, $after: String) {
 	}
 }`
 
-func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error) {
+func getUser(username, queryType string, c *fasthttp.Client) (*[]UserNode, *RateLimitInfo, error) {
 	var query string
 
 	if queryType == "following" {
@@ -101,11 +102,12 @@ func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error)
 	} else if queryType == "followers" {
 		query = followersQueryTemplate
 	} else {
-		return nil, fmt.Errorf("invalid query type: %s", queryType)
+		return nil, nil, fmt.Errorf("invalid query type: %s", queryType)
 	}
 
 	var endCursor *string
 	var nodes []UserNode
+	var rateLimitInfo *RateLimitInfo
 
 	for {
 		body := map[string]interface{}{
@@ -129,17 +131,19 @@ func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error)
 		defer fasthttp.ReleaseResponse(resp)
 
 		if err := c.Do(req, resp); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		respBody := &GraphQlResponse{}
 		if err := json.Unmarshal(resp.Body(), respBody); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		if len(respBody.Errors) > 0 {
-			return nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
+			return nil, nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
 		}
+
+		rateLimitInfo = parseRateLimitInfo(resp)
 
 		if queryType == "following" {
 			nodes = append(nodes, respBody.Data.User.Following.Nodes...)
@@ -155,7 +159,7 @@ func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error)
 			endCursor = &respBody.Data.User.Followers.PageInfo.EndCursor
 		}
 	}
-	return nodes, nil
+	return &nodes, rateLimitInfo, nil
 }
 
 func getBaseUser(username string, c *fasthttp.Client) (*UserNode, error) {
@@ -205,6 +209,18 @@ func getBaseUser(username string, c *fasthttp.Client) (*UserNode, error) {
 		}
 
 		endCursor = &respBody.Data.User.Following.PageInfo.EndCursor
+	}
+}
+
+func parseRateLimitInfo(resp *fasthttp.Response) *RateLimitInfo {
+	limit, _ := strconv.Atoi(string(resp.Header.Peek("X-RateLimit-Limit")))
+	remaining, _ := strconv.Atoi(string(resp.Header.Peek("X-RateLimit-Remaining")))
+	reset, _ := strconv.Atoi(string(resp.Header.Peek("X-RateLimit-Reset")))
+
+	return &RateLimitInfo{
+		Limit:     limit,
+		Remaining: remaining,
+		Reset:     reset,
 	}
 }
 
