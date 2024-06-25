@@ -22,10 +22,18 @@ type UserNode struct {
 	Followers struct {
 		Nodes      []UserNode `json:"nodes"`
 		TotalCount int        `json:"totalCount"`
+		PageInfo   struct {
+			EndCursor   string `json:"endCursor"`
+			HasNextPage bool   `json:"hasNextPage"`
+		} `json:"pageInfo"`
 	} `json:"followers"`
 	Following struct {
 		Nodes      []UserNode `json:"nodes"`
 		TotalCount int        `json:"totalCount"`
+		PageInfo   struct {
+			EndCursor   string `json:"endCursor"`
+			HasNextPage bool   `json:"hasNextPage"`
+		} `json:"pageInfo"`
 	} `json:"following"`
 	Prev *UserNode
 }

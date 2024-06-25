@@ -13,119 +13,198 @@ var (
 	token     = os.Getenv("GITHUB_TOKEN")
 )
 
+const followingQueryTemplate = `
+query ($username: String!, $after: String) {
+	user(login: $username) {
+		following(first: 100, after: $after) {
+			nodes {
+				login
+				avatarUrl
+				url
+				followers {
+					totalCount
+				}
+				following {
+					totalCount
+				}
+			}
+			pageInfo {
+				endCursor
+				hasNextPage
+			}
+		}
+	}
+}`
+
+const followersQueryTemplate = `
+query ($username: String!, $after: String) {
+	user(login: $username) {
+		followers(first: 100, after: $after) {
+			nodes {
+				login
+				avatarUrl
+				url
+				followers {
+					totalCount
+				}
+				following {
+					totalCount
+				}
+			}
+			pageInfo {
+				endCursor
+				hasNextPage
+			}
+		}
+	}
+}`
+
+const userQueryTemplate = `
+query ($username: String!, $after: String) {
+	user(login: $username) {
+		login
+		avatarUrl
+		followers(first: 100) {
+			nodes {
+				login
+				avatarUrl
+				url
+			}
+			totalCount
+			pageInfo {
+				endCursor
+				hasNextPage
+			}
+			
+		}
+		following(first: 100, after: $after) {
+			nodes {
+				login
+				avatarUrl
+				url
+			}
+			totalCount
+			pageInfo {
+				endCursor
+				hasNextPage
+			}
+		}
+		url
+	}
+}`
+
 func getUser(username, queryType string, c *fasthttp.Client) ([]UserNode, error) {
 	var query string
 
 	if queryType == "following" {
-		query = fmt.Sprintf(`
-		query {
-			user(login: "%s") {
-				following(first: 100) {
-					nodes {
-						login
-						avatarUrl
-						url
-						followers {
-							totalCount
-						}
-						following {
-							totalCount
-						}
-					}
-				}
-			}
-		}`, username)
+		query = followingQueryTemplate
 	} else if queryType == "followers" {
-		query = fmt.Sprintf(`
-		query {
-			user(login: "%s") {
-				followers(first: 100) {
-					nodes {
-						login
-						avatarUrl
-						url
-						followers {
-							totalCount
-						}
-						following {
-							totalCount
-						}
-					}
-				}
-			}
-		}`, username)
-	} else if queryType == "user" {
-		query = fmt.Sprintf(`
-		query {
-			user(login: "%s") {
-				login
-				avatarUrl
-				followers(first: 100) {
-					nodes {
-						login
-						avatarUrl
-						url
-					}
-					totalCount
-				}
-				following(first: 100) {
-					nodes {
-						login
-						avatarUrl
-						url
-						
-					}
-					totalCount
-				}
-				url
-			}
-		}`, username)
+		query = followersQueryTemplate
 	} else {
 		return nil, fmt.Errorf("invalid query type: %s", queryType)
 	}
 
-	body := map[string]interface{}{
-		"query": query,
+	var endCursor *string
+	var nodes []UserNode
+
+	for {
+		body := map[string]interface{}{
+			"query": query,
+			"variables": map[string]interface{}{
+				"username": username,
+				"after":    endCursor,
+			},
+		}
+		bodyJson, _ := json.Marshal(body)
+
+		req := fasthttp.AcquireRequest()
+		defer fasthttp.ReleaseRequest(req)
+		req.Header.SetMethod("POST")
+		req.SetRequestURI(githubUrl)
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Content-Type", "application/json")
+		req.SetBody(bodyJson)
+
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseResponse(resp)
+
+		if err := c.Do(req, resp); err != nil {
+			return nil, err
+		}
+
+		respBody := &GraphQlResponse{}
+		if err := json.Unmarshal(resp.Body(), respBody); err != nil {
+			return nil, err
+		}
+
+		if len(respBody.Errors) > 0 {
+			return nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
+		}
+
+		if queryType == "following" {
+			nodes = append(nodes, respBody.Data.User.Following.Nodes...)
+			if !respBody.Data.User.Following.PageInfo.HasNextPage {
+				break
+			}
+			endCursor = &respBody.Data.User.Following.PageInfo.EndCursor
+		} else {
+			nodes = append(nodes, respBody.Data.User.Followers.Nodes...)
+			if !respBody.Data.User.Followers.PageInfo.HasNextPage {
+				break
+			}
+			endCursor = &respBody.Data.User.Followers.PageInfo.EndCursor
+		}
 	}
-	bodyJson, _ := json.Marshal(body)
+	return nodes, nil
+}
 
-	req := fasthttp.AcquireRequest()
-	defer fasthttp.ReleaseRequest(req)
-	req.Header.SetMethod("POST")
-	req.SetRequestURI(githubUrl)
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBody(bodyJson)
+func getBaseUser(username string, c *fasthttp.Client) (*UserNode, error) {
+	var allFollowing []UserNode
+	var endCursor *string
 
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseResponse(resp)
+	for {
+		query := userQueryTemplate
 
-	if err := c.Do(req, resp); err != nil {
-		return nil, err
-	}
+		body := map[string]interface{}{
+			"query": query,
+			"variables": map[string]interface{}{
+				"username": username,
+				"after":    endCursor,
+			},
+		}
+		bodyJson, _ := json.Marshal(body)
 
-	respBody := &GraphQlResponse{}
-	if err := json.Unmarshal(resp.Body(), respBody); err != nil {
-		return nil, err
-	}
+		req := fasthttp.AcquireRequest()
+		defer fasthttp.ReleaseRequest(req)
+		req.Header.SetMethod("POST")
+		req.SetRequestURI(githubUrl)
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Content-Type", "application/json")
+		req.SetBody(bodyJson)
 
-	if len(respBody.Errors) > 0 {
-		return nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
-	}
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseResponse(resp)
 
-	if queryType == "following" {
-		return respBody.Data.User.Following.Nodes, nil
-	} else if queryType == "followers" {
-		return respBody.Data.User.Followers.Nodes, nil
-	} else {
-		return []UserNode{{
-			Login:     respBody.Data.User.Login,
-			AvatarUrl: respBody.Data.User.AvatarUrl,
-			Url:       respBody.Data.User.Url,
-			Followers: respBody.Data.User.Followers,
-			Following: respBody.Data.User.Following,
-		}}, nil
+		if err := c.Do(req, resp); err != nil {
+			return nil, err
+		}
 
+		respBody := &GraphQlResponse{}
+		if err := json.Unmarshal(resp.Body(), respBody); err != nil {
+			return nil, err
+		}
+
+		if len(respBody.Errors) > 0 {
+			return nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
+		}
+
+		allFollowing = append(allFollowing, respBody.Data.User.Following.Nodes...)
+		if !respBody.Data.User.Following.PageInfo.HasNextPage {
+			respBody.Data.User.Following.Nodes = allFollowing
+			return &respBody.Data.User, nil
+		}
+
+		endCursor = &respBody.Data.User.Following.PageInfo.EndCursor
 	}
 }
 
