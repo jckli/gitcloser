@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jckli/gitcloser/algorithm"
 	_ "github.com/joho/godotenv/autoload"
@@ -10,6 +11,10 @@ import (
 
 func main() {
 	client := &fasthttp.Client{}
-	path, err := algorithm.FindShortestPath("jckli", "Vendicated", client)
+	startTime := time.Now()
+	path, err := algorithm.FindShortestPath("jckli", "refact0r", client)
+	endTime := time.Now()
+
 	fmt.Println(path, err)
+	fmt.Println("Time taken: ", endTime.Sub(startTime))
 }

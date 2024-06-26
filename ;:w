@@ -69,6 +69,11 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 	endVisited[endUser] = endNode
 
 	for len(startQueue) > 0 && len(endQueue) > 0 {
+		fmt.Println(startQueue)
+		fmt.Println("-----")
+		fmt.Println(endQueue)
+		fmt.Println("-----")
+
 		var wg sync.WaitGroup
 		errChan := make(chan error, 2)
 
