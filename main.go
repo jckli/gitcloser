@@ -12,7 +12,7 @@ import (
 func main() {
 	client := &fasthttp.Client{}
 	startTime := time.Now()
-	path, err := algorithm.FindShortestPath("jckli", "refact0r", client)
+	path, err := algorithm.FindShortestPath("alii", "char", client)
 	endTime := time.Now()
 
 	fmt.Println(path, err)

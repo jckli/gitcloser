@@ -6,6 +6,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -94,6 +95,49 @@ query ($username: String!, $after: String) {
 	}
 }`
 
+func getPage(
+	username, query string,
+	endCursor *string,
+	c *fasthttp.Client,
+) (*UserNode, *RateLimitInfo, error) {
+
+	body := map[string]interface{}{
+		"query": query,
+		"variables": map[string]interface{}{
+			"username": username,
+			"after":    endCursor,
+		},
+	}
+	bodyJson, _ := json.Marshal(body)
+
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+	req.Header.SetMethod("POST")
+	req.SetRequestURI(githubUrl)
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBody(bodyJson)
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	if err := c.Do(req, resp); err != nil {
+		return nil, nil, err
+	}
+
+	respBody := &GraphQlResponse{}
+	if err := json.Unmarshal(resp.Body(), respBody); err != nil {
+		return nil, nil, err
+	}
+
+	if len(respBody.Errors) > 0 {
+		return nil, nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
+	}
+
+	rateLimitInfo := parseRateLimitInfo(resp)
+	return &respBody.Data.User, rateLimitInfo, nil
+}
+
 func getUser(username, queryType string, c *fasthttp.Client) (*[]UserNode, *RateLimitInfo, error) {
 	var query string
 
@@ -105,111 +149,112 @@ func getUser(username, queryType string, c *fasthttp.Client) (*[]UserNode, *Rate
 		return nil, nil, fmt.Errorf("invalid query type: %s", queryType)
 	}
 
-	var endCursor *string
-	var nodes []UserNode
-	var rateLimitInfo *RateLimitInfo
+	firstPage, rateLimitInfo, err := getPage(username, query, nil, c)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	for {
-		body := map[string]interface{}{
-			"query": query,
-			"variables": map[string]interface{}{
-				"username": username,
-				"after":    endCursor,
-			},
-		}
-		bodyJson, _ := json.Marshal(body)
-
-		req := fasthttp.AcquireRequest()
-		defer fasthttp.ReleaseRequest(req)
-		req.Header.SetMethod("POST")
-		req.SetRequestURI(githubUrl)
-		req.Header.Set("Authorization", "Bearer "+token)
-		req.Header.Set("Content-Type", "application/json")
-		req.SetBody(bodyJson)
-
-		resp := fasthttp.AcquireResponse()
-		defer fasthttp.ReleaseResponse(resp)
-
-		if err := c.Do(req, resp); err != nil {
-			return nil, nil, err
-		}
-
-		respBody := &GraphQlResponse{}
-		if err := json.Unmarshal(resp.Body(), respBody); err != nil {
-			return nil, nil, err
-		}
-
-		if len(respBody.Errors) > 0 {
-			return nil, nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
-		}
-
-		rateLimitInfo = parseRateLimitInfo(resp)
-
+	if !firstPage.PageInfo.HasNextPage {
 		if queryType == "following" {
-			nodes = append(nodes, respBody.Data.User.Following.Nodes...)
-			if !respBody.Data.User.Following.PageInfo.HasNextPage {
-				break
-			}
-			endCursor = &respBody.Data.User.Following.PageInfo.EndCursor
+			return &firstPage.Following.Nodes, rateLimitInfo, nil
 		} else {
-			nodes = append(nodes, respBody.Data.User.Followers.Nodes...)
-			if !respBody.Data.User.Followers.PageInfo.HasNextPage {
-				break
-			}
-			endCursor = &respBody.Data.User.Followers.PageInfo.EndCursor
+			return &firstPage.Followers.Nodes, rateLimitInfo, nil
 		}
 	}
-	return &nodes, rateLimitInfo, nil
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var allNodes []UserNode
+	var endCursor = firstPage.PageInfo.EndCursor
+	var pages []UserNode
+
+	if queryType == "following" {
+		allNodes = append(allNodes, firstPage.Following.Nodes...)
+	} else {
+		allNodes = append(allNodes, firstPage.Followers.Nodes...)
+	}
+	pageCount := 1
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		for endCursor != "" {
+			pageCount++
+			page, _, err := getPage(username, query, &endCursor, c)
+			if err != nil {
+				fmt.Println("error fetching page: ", err)
+				break
+			}
+			mu.Lock()
+			if queryType == "following" {
+				allNodes = append(pages, page.Following.Nodes...)
+			} else {
+				allNodes = append(pages, page.Followers.Nodes...)
+			}
+			mu.Unlock()
+			endCursor = page.PageInfo.EndCursor
+			if !page.PageInfo.HasNextPage {
+				break
+			}
+		}
+
+	}()
+	wg.Wait()
+	fmt.Println("Total pages fetched: ", pageCount)
+	return &allNodes, rateLimitInfo, nil
 }
 
-func getBaseUser(username string, c *fasthttp.Client) (*UserNode, error) {
-	var allFollowing []UserNode
-	var endCursor *string
+func getBaseUser(
+	username string,
+	c *fasthttp.Client,
+	following bool,
+) (*UserNode, *RateLimitInfo, error) {
+	query := userQueryTemplate
 
-	for {
-		query := userQueryTemplate
-
-		body := map[string]interface{}{
-			"query": query,
-			"variables": map[string]interface{}{
-				"username": username,
-				"after":    endCursor,
-			},
-		}
-		bodyJson, _ := json.Marshal(body)
-
-		req := fasthttp.AcquireRequest()
-		defer fasthttp.ReleaseRequest(req)
-		req.Header.SetMethod("POST")
-		req.SetRequestURI(githubUrl)
-		req.Header.Set("Authorization", "Bearer "+token)
-		req.Header.Set("Content-Type", "application/json")
-		req.SetBody(bodyJson)
-
-		resp := fasthttp.AcquireResponse()
-		defer fasthttp.ReleaseResponse(resp)
-
-		if err := c.Do(req, resp); err != nil {
-			return nil, err
-		}
-
-		respBody := &GraphQlResponse{}
-		if err := json.Unmarshal(resp.Body(), respBody); err != nil {
-			return nil, err
-		}
-
-		if len(respBody.Errors) > 0 {
-			return nil, fmt.Errorf("GraphQL error: %s", respBody.Errors[0].Message)
-		}
-
-		allFollowing = append(allFollowing, respBody.Data.User.Following.Nodes...)
-		if !respBody.Data.User.Following.PageInfo.HasNextPage {
-			respBody.Data.User.Following.Nodes = allFollowing
-			return &respBody.Data.User, nil
-		}
-
-		endCursor = &respBody.Data.User.Following.PageInfo.EndCursor
+	firstPage, rateLimitInfo, err := getPage(username, query, nil, c)
+	if err != nil {
+		return nil, nil, err
 	}
+
+	if !firstPage.Following.PageInfo.HasNextPage || !following {
+		return firstPage, rateLimitInfo, nil
+	}
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var allNodes []UserNode
+	var endCursor = firstPage.Following.PageInfo.EndCursor
+	var pages []UserNode
+
+	allNodes = append(allNodes, firstPage.Following.Nodes...)
+	pageCount := 1
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		for endCursor != "" {
+			pageCount++
+			page, _, err := getPage(username, query, &endCursor, c)
+			if err != nil {
+				fmt.Println("error fetching page: ", err)
+				break
+			}
+			mu.Lock()
+			allNodes = append(pages, page.Following.Nodes...)
+			mu.Unlock()
+			endCursor = page.Following.PageInfo.EndCursor
+			if !page.Following.PageInfo.HasNextPage {
+				break
+			}
+		}
+	}()
+	wg.Wait()
+	fmt.Println("Total pages fetched: ", pageCount)
+	firstPage.Following.Nodes = allNodes
+
+	return firstPage, rateLimitInfo, nil
 }
 
 func parseRateLimitInfo(resp *fasthttp.Response) *RateLimitInfo {

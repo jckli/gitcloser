@@ -35,7 +35,11 @@ type UserNode struct {
 			HasNextPage bool   `json:"hasNextPage"`
 		} `json:"pageInfo"`
 	} `json:"following"`
-	Prev *UserNode
+	Prev     *UserNode
+	PageInfo struct {
+		EndCursor   string `json:"endCursor"`
+		HasNextPage bool   `json:"hasNextPage"`
+	} `json:"pageInfo"`
 }
 
 type RateLimitResponse struct {

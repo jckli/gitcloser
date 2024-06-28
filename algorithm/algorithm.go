@@ -15,11 +15,11 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		startUserInfo, startUserErr = getBaseUser(startUser, c)
+		startUserInfo, _, startUserErr = getBaseUser(startUser, c, true)
 	}()
 	go func() {
 		defer wg.Done()
-		endUserInfo, endUserErr = getBaseUser(endUser, c)
+		endUserInfo, _, endUserErr = getBaseUser(endUser, c, false)
 	}()
 	wg.Wait()
 
