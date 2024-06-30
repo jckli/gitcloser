@@ -1,24 +1,25 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"time"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/jckli/gitcloser/algorithm"
+	"github.com/jckli/gitcloser/backend"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/valyala/fasthttp"
+	"os"
 )
 
 func main() {
-	client := &fasthttp.Client{}
 	app := fiber.New()
-	startTime := time.Now()
-	path, err := algorithm.FindShortestPath("jckli", "Phineas", client)
-	endTime := time.Now()
 
-	fmt.Println(path, err)
-	fmt.Println("Time taken: ", endTime.Sub(startTime))
+	/*
+		client := &fasthttp.Client{}
+		startTime := time.Now()
+		path, err := algorithm.FindShortestPath("jckli", "Phineas", client)
+		endTime := time.Now()
+
+		fmt.Println(path, err)
+		fmt.Println("Time taken: ", endTime.Sub(startTime))
+	*/
+
+	backend.InitRoutes(app)
 	app.Listen(":" + os.Getenv("PORT"))
 }

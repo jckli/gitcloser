@@ -2,10 +2,9 @@ package backend
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/jckli/gitcloser/backend/handlers/index"
 )
 
 func InitRoutes(app *fiber.App) {
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	app.Get("/", index.IndexHandler)
 }
