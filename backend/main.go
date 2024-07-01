@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/jckli/gitcloser/backend"
+	"github.com/jckli/gitcloser/routes"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/valyala/fasthttp"
 	"log"

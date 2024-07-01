@@ -3,8 +3,8 @@ package backend
 import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
-	"github.com/jckli/gitcloser/backend/v1/github"
-	"github.com/jckli/gitcloser/backend/v1/index"
+	"github.com/jckli/gitcloser/v1/github"
+	"github.com/jckli/gitcloser/v1/index"
 	"github.com/valyala/fasthttp"
 )
 
