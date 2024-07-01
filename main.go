@@ -5,6 +5,7 @@ import (
 	"github.com/jckli/gitcloser/backend"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/valyala/fasthttp"
+	"log"
 	"os"
 )
 
@@ -23,5 +24,8 @@ func main() {
 	*/
 
 	backend.InitRoutes(app, client)
-	app.Listen(":" + os.Getenv("PORT"))
+
+	if err := app.Listen(":" + os.Getenv("PORT")); err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }

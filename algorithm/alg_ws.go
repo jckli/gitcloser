@@ -2,12 +2,18 @@ package algorithm
 
 import (
 	"fmt"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/valyala/fasthttp"
 	"sync"
 )
 
-// implement a bidirectional bfs algorithm to find the shortest path between two nodes, which are startUser and endUser. strictly only go from startUser's following and recursively on to targetUser from targetUser's followers it should form a line like this: startUser -> people startUser follows/people following targetUser -> targetUser
-func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode, error) {
+var wsMutex sync.Mutex
+
+func FindShortestPathWS(
+	startUser, endUser string,
+	conn *websocket.Conn,
+	c *fasthttp.Client,
+) ([]UserNode, error) {
 	var startUserInfo, endUserInfo *UserNode
 	var startUserErr, endUserErr error
 	var wg sync.WaitGroup
@@ -24,15 +30,19 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 	wg.Wait()
 
 	if startUserErr != nil {
+		sendWebSocketMessage(conn, "error: "+startUserErr.Error())
 		return nil, startUserErr
 	}
 	if startUserInfo.Following.TotalCount == 0 {
+		sendWebSocketMessage(conn, "error: no path found")
 		return nil, fmt.Errorf("no path found")
 	}
 	if endUserErr != nil {
+		sendWebSocketMessage(conn, "error: "+endUserErr.Error())
 		return nil, endUserErr
 	}
 	if endUserInfo.Followers.TotalCount == 0 {
+		sendWebSocketMessage(conn, "error: no path found")
 		return nil, fmt.Errorf("no path found")
 	}
 
@@ -78,7 +88,7 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		go func() {
 			defer wg.Done()
 			var err error
-			newSQ, err = bfs(&startQueue, &startVisited, "start", c)
+			newSQ, err = bfsWS(&startQueue, &startVisited, "start", conn, c)
 			if err != nil {
 				errChan <- err
 			}
@@ -86,7 +96,7 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		go func() {
 			defer wg.Done()
 			var err error
-			newEQ, err = bfs(&endQueue, &endVisited, "end", c)
+			newEQ, err = bfsWS(&endQueue, &endVisited, "end", conn, c)
 			if err != nil {
 				errChan <- err
 			}
@@ -116,16 +126,19 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		endQueue = *newEQ
 	}
 
+	sendWebSocketMessage(conn, "error: no path found")
 	return nil, fmt.Errorf("no path found")
 }
 
-func bfs(
+func bfsWS(
 	queue *[]UserNode,
 	visited *map[string]UserNode,
-	direction string, c *fasthttp.Client,
+	direction string, conn *websocket.Conn, c *fasthttp.Client,
 ) (*[]UserNode, error) {
 	node := (*queue)[0]
 	*queue = (*queue)[1:]
+
+	sendWebSocketMessage(conn, fmt.Sprintf("processing_user: %s", node.Login))
 
 	if direction == "start" {
 		following, rateLimitFollowing, err := getUser(node.Login, "following", c)
@@ -134,6 +147,13 @@ func bfs(
 		}
 		fmt.Println(rateLimitFollowing)
 		if rateLimitFollowing.Remaining == 0 {
+			sendWebSocketMessage(
+				conn,
+				fmt.Sprintf(
+					"error: rate limit reached, try again in %d seconds",
+					rateLimitFollowing.Reset,
+				),
+			)
 			return nil, fmt.Errorf(
 				"rate limit reached, try again in %d seconds",
 				rateLimitFollowing.Reset,
@@ -154,6 +174,13 @@ func bfs(
 		}
 		fmt.Println(rateLimitFollowers)
 		if rateLimitFollowers.Remaining == 0 {
+			sendWebSocketMessage(
+				conn,
+				fmt.Sprintf(
+					"error: rate limit reached, try again in %d seconds",
+					rateLimitFollowers.Reset,
+				),
+			)
 			return nil, fmt.Errorf("rate limit reached, try again in %d seconds", rateLimitFollowers.Reset)
 		}
 
@@ -169,26 +196,9 @@ func bfs(
 	return queue, nil
 }
 
-func isIntersection(startVisited, endVisited *map[string]UserNode) (bool, UserNode, UserNode) {
-	for k, v := range *startVisited {
-		if u, exists := (*endVisited)[k]; exists {
-			return true, v, u
-		}
-	}
-	return false, UserNode{}, UserNode{}
-}
+func sendWebSocketMessage(conn *websocket.Conn, message string) {
+	wsMutex.Lock()
+	defer wsMutex.Unlock()
 
-func getPath(node *UserNode) []UserNode {
-	path := []UserNode{*node}
-	for node.Prev != nil {
-		path = append(path, *node.Prev)
-		node = node.Prev
-	}
-	return path
-}
-
-func reversePath(path *[]UserNode) {
-	for i := 0; i < len(*path)/2; i++ {
-		(*path)[i], (*path)[len(*path)-i-1] = (*path)[len(*path)-i-1], (*path)[i]
-	}
+	conn.WriteMessage(websocket.TextMessage, []byte(message))
 }
