@@ -1,4 +1,4 @@
-## GitCloser
+### GitCloser
 
 _git as in the version control system "Git"_
 
