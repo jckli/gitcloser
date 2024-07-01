@@ -19,6 +19,7 @@ type UserNode struct {
 	Login     string `json:"login"`
 	AvatarUrl string `json:"avatarUrl"`
 	Url       string `json:"url"`
+	Bio       string `json:"bio"`
 	Followers struct {
 		Nodes      []UserNode `json:"nodes"`
 		TotalCount int        `json:"totalCount"`

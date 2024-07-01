@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	url := "ws://localhost:3000/v1/github/pathway/jckli/Phineas/ws"
+	url := "ws://localhost:3000/v1/github/pathway/jckli/Vendicated/ws"
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatalf("Error connecting to websocket: %v", err)

@@ -41,6 +41,7 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		Prev:      nil,
 		AvatarUrl: startUserInfo.AvatarUrl,
 		Url:       startUserInfo.Url,
+		Bio:       startUserInfo.Bio,
 	}
 	startNode.Following.TotalCount = startUserInfo.Following.TotalCount
 	startNode.Followers.TotalCount = startUserInfo.Followers.TotalCount
@@ -49,6 +50,7 @@ func FindShortestPath(startUser, endUser string, c *fasthttp.Client) ([]UserNode
 		Prev:      nil,
 		AvatarUrl: endUserInfo.AvatarUrl,
 		Url:       endUserInfo.Url,
+		Bio:       endUserInfo.Bio,
 	}
 	endNode.Following.TotalCount = endUserInfo.Following.TotalCount
 	endNode.Followers.TotalCount = endUserInfo.Followers.TotalCount

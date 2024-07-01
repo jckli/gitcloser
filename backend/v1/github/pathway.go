@@ -1,4 +1,4 @@
-package pathway
+package github
 
 import (
 	"github.com/gofiber/contrib/websocket"
@@ -8,7 +8,6 @@ import (
 )
 
 func PathwayHandler(c *fiber.Ctx, client *fasthttp.Client) error {
-	// get parameter of user1 and user2
 	user1 := c.Params("user1")
 	user2 := c.Params("user2")
 
@@ -35,7 +34,6 @@ func PathwayHandler(c *fiber.Ctx, client *fasthttp.Client) error {
 }
 
 func PathwayHandlerWS(c *websocket.Conn, client *fasthttp.Client) {
-	// get parameter of user1 and user2
 	user1 := c.Params("user1")
 	user2 := c.Params("user2")
 
@@ -59,14 +57,15 @@ func PathwayHandlerWS(c *websocket.Conn, client *fasthttp.Client) {
 	return
 }
 
-func ParsePathwayUser(pathway []algorithm.UserNode) []PathwayUser {
-	pathwayUsers := make([]PathwayUser, len(pathway))
+func ParsePathwayUser(pathway []algorithm.UserNode) []GithubUser {
+	pathwayUsers := make([]GithubUser, len(pathway))
 
 	for i, user := range pathway {
-		pathwayUsers[i] = PathwayUser{
+		pathwayUsers[i] = GithubUser{
 			Login:     user.Login,
 			AvatarUrl: user.AvatarUrl,
 			Url:       user.Url,
+			Bio:       user.Bio,
 			Followers: struct {
 				TotalCount int `json:"totalCount"`
 			}{

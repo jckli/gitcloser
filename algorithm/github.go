@@ -23,6 +23,7 @@ query ($username: String!, $after: String) {
 				login
 				avatarUrl
 				url
+				bio
 				followers {
 					totalCount
 				}
@@ -46,6 +47,7 @@ query ($username: String!, $after: String) {
 				login
 				avatarUrl
 				url
+				bio
 				followers {
 					totalCount
 				}
@@ -66,6 +68,7 @@ query ($username: String!, $after: String) {
 	user(login: $username) {
 		login
 		avatarUrl
+		bio
 		followers(first: 100) {
 			nodes {
 				login
