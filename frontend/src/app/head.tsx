@@ -3,7 +3,7 @@ export default function Head() {
 		<>
 			<title>ohashi</title>
 			<meta content="width=device-width, initial-scale=1" name="viewport" />
-			<link rel="icon" href="/favicon.ico" />
+			<link rel="icon" href="/public/eye.png" type="image/png" sizes="any" />
 		</>
 	);
 }
