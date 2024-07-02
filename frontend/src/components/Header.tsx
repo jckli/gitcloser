@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Header = () => {
 	return (
@@ -33,6 +35,11 @@ export const Header = () => {
 							</a>
 						</li>
 					</ul>
+					<div className="flex text-zinc-600 hover:text-white/90 duration-200 ease-in-out">
+						<a href="https://github.com/jckli/gitcloser">
+							<FontAwesomeIcon icon={faGithub} />
+						</a>
+					</div>
 				</div>
 			</div>
 		</>
