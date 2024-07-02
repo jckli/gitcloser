@@ -1,1 +1,10 @@
 .env
+
+frontend/node_modules
+frontend/.next
+frontend/out
+frontend/bun.lockb
+frontend/build
+frontend/.env
+frontend/.vercel
+frontend/package-lock.json
