@@ -59,14 +59,27 @@ export const Tree = () => {
 						"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
 					backgroundSize: "100% 300%",
 				}}
-				initial={{ opacity: highlightPath == null ? 0 : 1 }}
+				initial={{
+					opacity: highlightPath == null ? 0 : 1,
+				}}
 				animate={{
-					opacity: highlightPath === 0 || highlightPath == null ? 1 : 0,
-					backgroundPosition: ["0% 100%", "0% 0%"],
+					opacity:
+						highlightPath === 0 ||
+						highlightPath == null
+							? 1
+							: 0,
+					backgroundPosition: [
+						"0% 100%",
+						"0% 0%",
+					],
 				}}
 				transition={{
 					opacity: {
-						delay: highlightPath === 0 || highlightPath != null ? 0 : 2.5,
+						delay:
+							highlightPath === 0 ||
+							highlightPath != null
+								? 0
+								: 2.5,
 						duration: 0.5,
 					},
 					backgroundPosition: {
@@ -87,14 +100,27 @@ export const Tree = () => {
 						"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
 					backgroundSize: "100% 300%",
 				}}
-				initial={{ opacity: highlightPath == null ? 0 : 1 }}
+				initial={{
+					opacity: highlightPath == null ? 0 : 1,
+				}}
 				animate={{
-					opacity: highlightPath === 1 || highlightPath == null ? 1 : 0,
-					backgroundPosition: ["0% 100%", "0% 0%"],
+					opacity:
+						highlightPath === 1 ||
+						highlightPath == null
+							? 1
+							: 0,
+					backgroundPosition: [
+						"0% 100%",
+						"0% 0%",
+					],
 				}}
 				transition={{
 					opacity: {
-						delay: highlightPath === 1 || highlightPath != null ? 0 : 3,
+						delay:
+							highlightPath === 1 ||
+							highlightPath != null
+								? 0
+								: 3,
 						duration: 0.5,
 					},
 					backgroundPosition: {
@@ -114,14 +140,27 @@ export const Tree = () => {
 						"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
 					backgroundSize: "100% 300%",
 				}}
-				initial={{ opacity: highlightPath == null ? 0 : 1 }}
+				initial={{
+					opacity: highlightPath == null ? 0 : 1,
+				}}
 				animate={{
-					opacity: highlightPath === 2 || highlightPath == null ? 1 : 0,
-					backgroundPosition: ["0% 100%", "0% 0%"],
+					opacity:
+						highlightPath === 2 ||
+						highlightPath == null
+							? 1
+							: 0,
+					backgroundPosition: [
+						"0% 100%",
+						"0% 0%",
+					],
 				}}
 				transition={{
 					opacity: {
-						delay: highlightPath === 2 || highlightPath != null ? 0 : 3.5,
+						delay:
+							highlightPath === 2 ||
+							highlightPath != null
+								? 0
+								: 3.5,
 						duration: 0.5,
 					},
 					backgroundPosition: {
@@ -142,14 +181,27 @@ export const Tree = () => {
 						"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
 					backgroundSize: "100% 300%",
 				}}
-				initial={{ opacity: highlightPath == null ? 0 : 1 }}
+				initial={{
+					opacity: highlightPath == null ? 0 : 1,
+				}}
 				animate={{
-					opacity: highlightPath === 3 || highlightPath == null ? 1 : 0,
-					backgroundPosition: ["0% 100%", "0% 0%"],
+					opacity:
+						highlightPath === 3 ||
+						highlightPath == null
+							? 1
+							: 0,
+					backgroundPosition: [
+						"0% 100%",
+						"0% 0%",
+					],
 				}}
 				transition={{
 					opacity: {
-						delay: highlightPath === 3 || highlightPath != null ? 0 : 4,
+						delay:
+							highlightPath === 3 ||
+							highlightPath != null
+								? 0
+								: 4,
 						duration: 0.5,
 					},
 					backgroundPosition: {
@@ -170,14 +222,27 @@ export const Tree = () => {
 						"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
 					backgroundSize: "100% 300%",
 				}}
-				initial={{ opacity: highlightPath == null ? 0 : 1 }}
+				initial={{
+					opacity: highlightPath == null ? 0 : 1,
+				}}
 				animate={{
-					opacity: highlightPath === 4 || highlightPath == null ? 1 : 0,
-					backgroundPosition: ["0% 100%", "0% 0%"],
+					opacity:
+						highlightPath === 4 ||
+						highlightPath == null
+							? 1
+							: 0,
+					backgroundPosition: [
+						"0% 100%",
+						"0% 0%",
+					],
 				}}
 				transition={{
 					opacity: {
-						delay: highlightPath === 4 || highlightPath != null ? 0 : 4.5,
+						delay:
+							highlightPath === 4 ||
+							highlightPath != null
+								? 0
+								: 4.5,
 						duration: 0.5,
 					},
 					backgroundPosition: {
@@ -191,29 +256,51 @@ export const Tree = () => {
 				{Array.from({ length: 5 }).map((_, index) => (
 					<motion.div
 						key={index}
-						initial={{ opacity: highlightPath == null ? 0 : 1 }}
+						initial={{
+							opacity:
+								highlightPath ==
+								null
+									? 0
+									: 1,
+						}}
 						animate={{
 							opacity:
-								highlightPath === index ? 1 : highlightPath == null ? 1 : 0.2,
+								highlightPath ===
+								index
+									? 1
+									: highlightPath ==
+										  null
+										? 1
+										: 0.2,
 						}}
 						transition={{
 							duration: 0.5,
 							delay:
-								highlightPath === index
+								highlightPath ===
+								index
 									? 0
-									: highlightPath == null
-										? 2.5 + index * 0.5
+									: highlightPath ==
+										  null
+										? 2.5 +
+											index *
+												0.5
 										: 0,
 						}}
 					>
 						<div className="relative z-10 rounded-full w-20 h-20 border-ender-medium-gray border-[1px] flex items-center justify-center text-white">
 							<Image
-								src={users[index]}
+								src={
+									users[
+										index
+									]
+								}
 								className="rounded-full"
 								alt="user"
 								width={80}
 								height={80}
-								unoptimized={true}
+								unoptimized={
+									true
+								}
 							/>
 						</div>
 					</motion.div>

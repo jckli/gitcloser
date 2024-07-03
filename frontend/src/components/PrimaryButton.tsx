@@ -16,7 +16,13 @@ export const PrimaryButton = (props: any) => {
             "
 						whileTap={{ scale: 0.95 }}
 					>
-						{props.icon && <FontAwesomeIcon icon={props.icon} />}
+						{props.icon && (
+							<FontAwesomeIcon
+								icon={
+									props.icon
+								}
+							/>
+						)}
 						<span
 							className={`${props.icon && "ml-[8px]"} hidden sm:inline-block`}
 						>
@@ -34,7 +40,11 @@ export const PrimaryButton = (props: any) => {
             "
 					whileTap={{ scale: 0.95 }}
 				>
-					{props.icon && <FontAwesomeIcon icon={props.icon} />}
+					{props.icon && (
+						<FontAwesomeIcon
+							icon={props.icon}
+						/>
+					)}
 					<span
 						className={`${props.icon && "ml-[8px]"} hidden sm:inline-block`}
 					>

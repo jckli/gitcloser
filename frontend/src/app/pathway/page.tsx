@@ -11,7 +11,9 @@ export default function MainPage() {
 						Created with ❤️ by jckli
 					</h3>
 					<h1 className="mb-4 font-semibold">
-						Find how close you are to another GitHub user in 20 seconds or less
+						Find how close you are to
+						another GitHub user in 20
+						seconds or less
 					</h1>
 					<PrimaryButton text="Start Now" />
 					<SecondaryButton
