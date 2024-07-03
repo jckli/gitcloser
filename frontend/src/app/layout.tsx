@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import Head from "./head";
 import "../globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -11,7 +12,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<head />
+			<Head />
 			<body>
 				<Header />
 				{children}

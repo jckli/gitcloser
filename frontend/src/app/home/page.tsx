@@ -1,9 +1,8 @@
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { SecondaryButton } from "@/components/SecondaryButton";
-import { Tree } from "@/components/Tree";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
-export default function Home() {
+export default function MainPage() {
 	return (
 		<>
 			<div className="w-full h-[600px] flex gap-20 items-center justify-center text-3xl font-lexend text-zinc-300">
@@ -14,14 +13,13 @@ export default function Home() {
 					<h1 className="mb-4 font-semibold">
 						Find how close you are to another GitHub user in 20 seconds or less
 					</h1>
-					<PrimaryButton text="Start Now" link="/home" useNextLink={true} />
+					<PrimaryButton text="Start Now" />
 					<SecondaryButton
 						text="GitHub"
 						icon={faGithub}
 						link="https://github.com/jckli/gitcloser"
 					/>
 				</div>
-				<Tree />
 			</div>
 		</>
 	);
