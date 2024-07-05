@@ -14,7 +14,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
-import useWebSocket from "../hooks/useWebsocket";
+import useWebSocket from "@/hooks/useWebsocket";
 import { useEffect, useState } from "react";
 
 export default function Pathway() {
