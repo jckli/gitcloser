@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import useWebSocket from "@/hooks/useWebsocket";
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { PathwayVisualization } from "@/components/Pathway";
 
 export default function Pathway() {
 	const [open, setOpen] = useState<boolean>(false);
@@ -24,27 +25,35 @@ export default function Pathway() {
 	const [endUser, setEndUser] = useState<string>("");
 	const [url, setUrl] = useState<string>("");
 	const { messages } = useWebSocket(url);
+	const jsonRef = useRef(null);
+	const [lastMessage, setLastMessage] = useState<string>("");
 
-	var lastMessage = messages[messages.length - 1];
-	var json = null;
-	try {
-		json = JSON.parse(lastMessage);
-	} catch (error) {
-		if (lastMessage) {
-			lastMessage = lastMessage.replace(
-				/^processing_user:\s*/,
-				"",
-			);
+	useEffect(() => {
+		const lastMessage = messages[messages.length - 1];
+		let json = null;
+
+		try {
+			json = JSON.parse(lastMessage);
+		} catch (error) {
+			if (lastMessage) {
+				const formatMessage = lastMessage.replace(
+					/^processing_user:\s*/,
+					"",
+				);
+				setLastMessage(formatMessage);
+			}
 		}
-	}
 
-	if (json) {
-		messages.splice(0, messages.length);
-		setOpen(false);
-		setTimeout(() => {
-			setCalculating(false);
-		}, 500);
-	}
+		if (json) {
+			jsonRef.current = json;
+			setLastMessage("");
+			messages.splice(0, messages.length); // Clear messages
+			setOpen(false);
+			setTimeout(() => {
+				setCalculating(false);
+			}, 500);
+		}
+	}, [messages]);
 
 	const handleFindPath = () => {
 		setCalculating(true);
@@ -63,7 +72,7 @@ export default function Pathway() {
 
 	return (
 		<>
-			<div className="w-full flex gap-20 items-center justify-center text-3xl font-lexend text-zinc-300">
+			<div className="w-full flex flex-col gap-20 items-center justify-center text-3xl font-lexend text-zinc-300">
 				<Dialog open={open} onOpenChange={setOpen}>
 					<DialogTrigger>
 						<div className="mt-4">
@@ -150,6 +159,11 @@ export default function Pathway() {
 						)}
 					</DialogContent>
 				</Dialog>
+				<div>
+					<PathwayVisualization
+						json={jsonRef.current}
+					/>
+				</div>
 			</div>
 		</>
 	);
