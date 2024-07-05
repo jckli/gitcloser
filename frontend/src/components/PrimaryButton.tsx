@@ -24,7 +24,7 @@ export const PrimaryButton = (props: any) => {
 							/>
 						)}
 						<span
-							className={`${props.icon && "ml-[8px]"} hidden sm:inline-block`}
+							className={`${props.icon ? "ml-[8px] hidden sm:inline-block" : "inline-block"}`}
 						>
 							{props.text || "Text"}
 						</span>
@@ -46,7 +46,7 @@ export const PrimaryButton = (props: any) => {
 						/>
 					)}
 					<span
-						className={`${props.icon && "ml-[8px]"} hidden sm:inline-block`}
+						className={`${props.icon ? "ml-[8px] hidden sm:inline-block" : "inline-block"}`}
 					>
 						{props.text || "Text"}
 					</span>

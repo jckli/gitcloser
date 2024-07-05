@@ -6,8 +6,8 @@ import { faGithub } from "@fortawesome/free-brands-svg-icons";
 export default function Home() {
 	return (
 		<>
-			<div className="w-full h-[600px] flex gap-20 items-center justify-center text-3xl font-lexend text-zinc-300">
-				<div className="text-left w-[400px]">
+			<div className="w-full h-[600px] flex lg:flex-row flex-col gap-20 items-center justify-center text-3xl font-lexend text-zinc-300 px-6">
+				<div className="text-left max-w-[400px] pt-48 lg:pt-0">
 					<h3 className="mb-2 text-base text-zinc-400">
 						Created with ❤️ by jckli
 					</h3>
@@ -27,7 +27,9 @@ export default function Home() {
 						link="https://github.com/jckli/gitcloser"
 					/>
 				</div>
-				<Tree />
+				<div className="sm:block hidden">
+					<Tree />
+				</div>
 			</div>
 		</>
 	);
