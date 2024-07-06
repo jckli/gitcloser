@@ -27,6 +27,7 @@ export default function Pathway() {
 	const { messages } = useWebSocket(url);
 	const jsonRef = useRef(null);
 	const [lastMessage, setLastMessage] = useState<string>("");
+	const [error, setError] = useState<string>("");
 
 	useEffect(() => {
 		const lastMessage = messages[messages.length - 1];
@@ -45,6 +46,12 @@ export default function Pathway() {
 		}
 
 		if (json) {
+			if (json.error) {
+				setError(json.error);
+				setCalculating(false);
+				return;
+			}
+			setError("");
 			jsonRef.current = json;
 			setLastMessage("");
 			messages.splice(0, messages.length); // Clear messages
@@ -56,13 +63,29 @@ export default function Pathway() {
 	}, [messages]);
 
 	const handleFindPath = () => {
-		setCalculating(true);
 		const start = document.getElementById(
 			"startUser",
 		) as HTMLInputElement;
 		const end = document.getElementById(
 			"endUser",
 		) as HTMLInputElement;
+
+		if (!start.value || !end.value) {
+			setError("Please enter a start and end user.");
+			return;
+		}
+
+		if (start.value == end.value) {
+			setError("Start and end users cannot be the same.");
+			return;
+		}
+
+		if (start.value == startUser && end.value == endUser) {
+			setError("Start and end users are the same as before.");
+			return;
+		}
+
+		setCalculating(true);
 		setStartUser(start.value);
 		setEndUser(end.value);
 		setUrl(
@@ -112,7 +135,17 @@ export default function Pathway() {
 							</DialogHeader>
 							{!calculating ? (
 								<>
-									<div className="grid gap-4 py-4">
+									{error && (
+										<p className="text-red-400 text-sm">
+											Error:{" "}
+											{
+												error
+											}
+										</p>
+									)}
+									<div
+										className={`grid gap-4 ${!error ? "py-4" : "pb-4"}`}
+									>
 										<div className="flex flex-col gap-1">
 											<h1 className="font-lexend text-zinc-300 text-base text-left">
 												Start
