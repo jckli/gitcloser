@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import useWindowWidth from "@/hooks/useWindowWidth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
 export const PathwayVisualization = (props: any) => {
 	if (!props.json) {
@@ -48,11 +50,29 @@ export const PathwayVisualization = (props: any) => {
 											true
 										}
 									/>
-									<h1 className="text-2xl mt-1 text-center">
-										{
-											user.login
-										}
-									</h1>
+									<div className="flex gap-2 items-center">
+										<h1 className="text-2xl mt-1 text-center">
+											{
+												user.login
+											}
+										</h1>
+										<motion.a
+											href={
+												user.url
+											}
+											target="_blank"
+											className="inline-block text-zinc-500 transition-all hover:text-zinc-300 duration-200 ease-in-out text-2xl"
+											whileTap={{
+												scale: 0.95,
+											}}
+										>
+											<FontAwesomeIcon
+												icon={
+													faGithub
+												}
+											/>
+										</motion.a>
+									</div>
 								</div>
 								{user.bio !=
 									"" && (
