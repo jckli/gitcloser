@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import useWindowWidth from "@/hooks/useWindowWidth";
 
 export const PathwayVisualization = (props: any) => {
 	if (!props.json) {
@@ -18,10 +19,11 @@ export const PathwayVisualization = (props: any) => {
 	}
 
 	const pathway = props.json.data.pathway;
+	const windowWidth = useWindowWidth();
 
 	return (
 		<>
-			<div className="flex gap-20 overflow-x-auto max-w-[700px] mlg:max-w-[850px] xl:max-w-[1100px] h-80 overflow-y-hidden">
+			<div className="flex flex-col md:flex-row md:gap-20 md:overflow-x-auto max-w-[700px] mlg:max-w-[850px] xl:max-w-[1100px] md:h-80 md:overflow-y-hidden mb-16 md:mb-0">
 				{pathway.map((user: any, index: number) => (
 					<div key={index}>
 						<div className="relative z-10 w-60 h-72 border-white/10 border-[1px] rounded-lg bg-ender-black text-zinc-300">
@@ -64,33 +66,65 @@ export const PathwayVisualization = (props: any) => {
 							</div>
 						</div>
 						{index < pathway.length - 1 && (
-							<motion.div
-								className={`relative left-[280px] bottom-[200px] w-[2px] bg-ender-medium-gray z-0`}
-								style={{
-									height: 120,
-									rotate: "-90deg",
-									animation: "ease 1s infinite",
-									backgroundImage:
-										"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
-									backgroundSize:
-										"100% 300%",
-								}}
-								animate={{
-									backgroundPosition:
-										[
-											"0% 100%",
-											"0% 0%",
-										],
-								}}
-								transition={{
-									backgroundPosition:
-										{
-											duration: 1,
-											repeat: Infinity,
-											ease: "easeInOut",
-										},
-								}}
-							/>
+							<>
+								{windowWidth >
+								768 ? (
+									<motion.div
+										className={`relative left-[280px] bottom-[200px] w-[2px] bg-ender-medium-gray z-0`}
+										style={{
+											height: 120,
+											rotate: "-90deg",
+											animation: "ease 1s infinite",
+											backgroundImage:
+												"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
+											backgroundSize:
+												"100% 300%",
+										}}
+										animate={{
+											backgroundPosition:
+												[
+													"0% 100%",
+													"0% 0%",
+												],
+										}}
+										transition={{
+											backgroundPosition:
+												{
+													duration: 1,
+													repeat: Infinity,
+													ease: "easeInOut",
+												},
+										}}
+									/>
+								) : (
+									<motion.div
+										className={`relative left-[120px] w-[2px] bg-ender-medium-gray z-0`}
+										style={{
+											height: 60,
+											animation: "ease 1s infinite",
+											backgroundImage:
+												"linear-gradient(0deg,transparent 33%,hsla(0,0%,100%,.5) 50%,transparent 66%)",
+											backgroundSize:
+												"100% 300%",
+										}}
+										animate={{
+											backgroundPosition:
+												[
+													"0% 100%",
+													"0% 0%",
+												],
+										}}
+										transition={{
+											backgroundPosition:
+												{
+													duration: 1,
+													repeat: Infinity,
+													ease: "easeInOut",
+												},
+										}}
+									/>
+								)}
+							</>
 						)}
 					</div>
 				))}
