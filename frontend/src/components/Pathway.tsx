@@ -18,43 +18,44 @@ export const PathwayVisualization = (props: any) => {
 	}
 
 	const pathway = props.json.data.pathway;
-	console.log(pathway);
 
 	return (
 		<>
-			<div className="flex gap-20">
+			<div className="flex gap-20 overflow-x-auto max-w-[700px] mlg:max-w-[850px] xl:max-w-[1100px] h-80 overflow-y-hidden">
 				{pathway.map((user: any, index: number) => (
 					<div key={index}>
 						<div className="relative z-10 w-60 h-72 border-white/10 border-[1px] rounded-lg bg-ender-black text-zinc-300">
 							<div
-								className={`py-6 px-8 flex flex-col items-center ${user.bio == "" && "justify-center"} h-full`}
+								className={`py-6 px-8 flex flex-col ${user.bio == "" && "justify-center"} h-full`}
 							>
-								<Image
-									src={
-										user.avatarUrl
-									}
-									alt={
-										user.login
-									}
-									width={
-										100
-									}
-									height={
-										100
-									}
-									className="rounded-full"
-									unoptimized={
-										true
-									}
-								/>
-								<h1 className="text-2xl mt-1 text-center">
-									{
-										user.login
-									}
-								</h1>
+								<div className="flex flex-col items-center">
+									<Image
+										src={
+											user.avatarUrl
+										}
+										alt={
+											user.login
+										}
+										width={
+											100
+										}
+										height={
+											100
+										}
+										className="rounded-full"
+										unoptimized={
+											true
+										}
+									/>
+									<h1 className="text-2xl mt-1 text-center">
+										{
+											user.login
+										}
+									</h1>
+								</div>
 								{user.bio !=
 									"" && (
-									<p className="text-base mt-4 text-zinc-500">
+									<p className="text-sm mt-2 text-zinc-500 line-clamp-4">
 										{
 											user.bio
 										}
