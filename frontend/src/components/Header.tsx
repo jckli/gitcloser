@@ -19,16 +19,16 @@ export const Header = () => {
 									false
 								}
 							/>
-							<h1 className="text-ender-main-blue font-bold ml-1">
+							<h1 className="text-ender-main-blue font-bold ml-1 hidden md:block">
 								GitCloser
 							</h1>
 						</div>
 					</Link>
-					<ul className="hidden md:flex gap-[20px] list-none text-zinc-600 ml-[40px] text-xl flex-1 font-bold">
+					<ul className="flex gap-[20px] list-none text-zinc-600 md:ml-[40px] text-xl flex-1 font-bold">
 						<li>
 							<Link
 								href="/"
-								className="hover:text-white/90 transition-all duration-200 ease-in-out"
+								className="hover:text-white/90 transition-all duration-200 ease-in-out hidden md:block"
 							>
 								home
 							</Link>

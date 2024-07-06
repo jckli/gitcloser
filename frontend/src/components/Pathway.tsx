@@ -8,10 +8,9 @@ export const PathwayVisualization = (props: any) => {
 	if (!props.json) {
 		return (
 			<>
-				<div>
-					<h1>
-						Select a start and end user
-						first
+				<div className="flex items-center justify-center text-center text-zinc-300">
+					<h1 className="text-xl px-6">
+						Select a start and end user.
 					</h1>
 				</div>
 			</>
