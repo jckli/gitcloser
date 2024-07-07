@@ -399,7 +399,7 @@ export default function Pathway() {
 															),
 														)
 													) : (
-														<div className="p-2 ">
+														<div className="p-2 text-center text-zinc-500">
 															<p>
 																No
 																results
