@@ -13,18 +13,18 @@ const config = {
 		container: {
 			center: true,
 			padding: "2rem",
-			screens: {
-				xxsm: "380px",
-				xsm: "460px",
-				sxsm: "510px",
-				sm: "640px",
-				md: "768px",
-				mmlg: "810px",
-				mlg: "894px",
-				lg: "1024px",
-				xl: "1280px",
-				"2xl": "1400px",
-			},
+		},
+		screens: {
+			xxsm: "380px",
+			xsm: "460px",
+			vsm: "510px",
+			sm: "640px",
+			md: "768px",
+			mmlg: "810px",
+			mlg: "894px",
+			lg: "1024px",
+			xl: "1280px",
+			"2xl": "1400px",
 		},
 		extend: {
 			keyframes: {
