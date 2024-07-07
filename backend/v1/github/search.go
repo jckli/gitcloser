@@ -7,6 +7,10 @@ import (
 
 func SearchHandler(c *fiber.Ctx, client *fasthttp.Client) error {
 	query := c.Params("query")
+
+	c.Response().Header.Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header.Set("Content-Type", "application/json")
+
 	users, _, err := getSearchQuery(query, client)
 	if err != nil {
 		return c.Status(500).JSON(&ErrorResponse{

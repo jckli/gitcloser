@@ -10,6 +10,13 @@ import (
 )
 
 func InitRoutes(app *fiber.App, client *fasthttp.Client) {
+	/*
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "https://*.hayasaka.moe",
+		}))
+	*/
+	app.Use(cors.New())
+
 	// v1 routes
 	app.Get("/", index.IndexHandler)
 
@@ -30,14 +37,4 @@ func InitRoutes(app *fiber.App, client *fasthttp.Client) {
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).SendString("Page not found")
 	})
-
-	/*
-		app.Use(cors.New(cors.Config{
-			AllowOrigins: "https://*.hayasaka.moe",
-		}))
-	*/
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept",
-	}))
 }
