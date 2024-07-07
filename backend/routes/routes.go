@@ -3,6 +3,7 @@ package backend
 import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jckli/gitcloser/v1/github"
 	"github.com/jckli/gitcloser/v1/index"
 	"github.com/valyala/fasthttp"
@@ -29,4 +30,11 @@ func InitRoutes(app *fiber.App, client *fasthttp.Client) {
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).SendString("Page not found")
 	})
+
+	/*
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "https://*.hayasaka.moe",
+		}))
+	*/
+	app.Use(cors.New())
 }
