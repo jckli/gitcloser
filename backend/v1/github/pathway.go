@@ -13,7 +13,7 @@ func PathwayHandler(c *fiber.Ctx, client *fasthttp.Client) error {
 
 	pathway, err := algorithm.FindShortestPath(user1, user2, client)
 
-	c.Response().Header.Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header.Set("Access-Control-Allow-Origin", "https://gitcloser.hayasaka.moe")
 	c.Response().Header.Set("Content-Type", "application/json")
 
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 func SearchHandler(c *fiber.Ctx, client *fasthttp.Client) error {
 	query := c.Params("query")
 
-	c.Response().Header.Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header.Set("Access-Control-Allow-Origin", "https://gitcloser.hayasaka.moe")
 	c.Response().Header.Set("Content-Type", "application/json")
 
 	users, _, err := getSearchQuery(query, client)
