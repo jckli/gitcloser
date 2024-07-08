@@ -161,7 +161,6 @@ export default function Pathway() {
 		const end = document.getElementById(
 			"endUser",
 		) as HTMLInputElement;
-		console.log(startUser, endUser, start.value, end.value);
 
 		if (start.value != startUser || end.value != endUser) {
 			setError("Please select only users from the dropdown.");
@@ -270,7 +269,7 @@ export default function Pathway() {
 													className={`absolute ${error ? "top-[215px]" : "top-[195px]"} bg-ender-black border-[1px] border-white/10 rounded-lg text-zinc-300 sm:w-[375px] font-lexend`}
 												>
 													{searchResults.length >
-													0 ? (
+														0 ? (
 														searchResults.map(
 															(
 																user,
@@ -354,7 +353,7 @@ export default function Pathway() {
 													className={`absolute ${error ? "top-[300px]" : "top-[280px]"} bg-ender-black border-[1px] border-white/10 rounded-lg text-zinc-300 sm:w-[375px] font-lexend`}
 												>
 													{searchResults.length >
-													0 ? (
+														0 ? (
 														searchResults.map(
 															(
 																user,
