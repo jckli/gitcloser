@@ -4,7 +4,7 @@ _**Git** as in the version control system "Git" & **Closer** as in "how close on
 
 # 🔎 Find how close you are to another GitHub user in less than 20 seconds
 
-> GitCloser Algorithm is located at `/backend/algorithm`
+> GitCloser Bi-directional BFS algorithm is located at `/backend/algorithm`
 
 GitCloser is a web application that makes it super easy to find out how close you are to another GitHub user. It utilizes a Bidirectional Breadth First Search (BFS) algorithm to find the (mostly shortest) path between two users on GitHub. Implemented in Go with go routines for concurrency, the algorithm takes around 20 seconds or less for most users on GitHub.
 
