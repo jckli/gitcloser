@@ -18,6 +18,8 @@ You can try it out at [gitcloser.hayasaka.moe](https://gitcloser.hayasaka.moe) w
 - Node.js 22.3.0
 - GitHub account
 
+### Steps
+
 1. Clone the repository
 2. Create a GitHub OAuth App at [https://github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta). You can just generate one with no scopes or permissions. Copy the API key.
 3. Create a `.env` file in the `/backend` directory with the following content:
