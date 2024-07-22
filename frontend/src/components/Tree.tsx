@@ -13,7 +13,6 @@ export const Tree = () => {
 			setHighlightPath(Math.floor(Math.random() * 5));
 		}, 6000);
 	}, []);
-	console.log(highlightPath);
 
 	const boxWidth = 560;
 	const boxHeight = 288;

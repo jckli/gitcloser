@@ -26,7 +26,6 @@ const useWebSocket = (url: string): WebSocketHook => {
 						...prevMessages,
 						data,
 					]);
-					console.log(data);
 				};
 
 				socket.onerror = (error) => {

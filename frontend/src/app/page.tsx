@@ -9,7 +9,7 @@ export default function Home() {
 			<div className="w-full h-[600px] flex lg:flex-row flex-col gap-20 items-center justify-center text-3xl font-lexend text-zinc-300 px-6">
 				<div className="text-left max-w-[400px] pt-48 lg:pt-0">
 					<h3 className="mb-2 text-base text-zinc-400">
-						Currently in Beta
+						Beta Release
 					</h3>
 					<h1 className="mb-4 font-semibold">
 						Find how close you are to
