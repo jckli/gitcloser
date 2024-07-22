@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import Head from "./head";
 import "../globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
@@ -13,9 +14,12 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<Head />
-			<body>
+			<body className="min-h-screen flex flex-col">
 				<Header />
-				{children}
+				<div className="flex flex-col flex-grow">
+					{children}
+				</div>
+				<Footer />
 			</body>
 		</html>
 	);

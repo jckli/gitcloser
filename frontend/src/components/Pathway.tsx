@@ -10,9 +10,13 @@ export const PathwayVisualization = (props: any) => {
 	if (!props.json) {
 		return (
 			<>
-				<div className="flex items-center justify-center text-center text-zinc-300">
+				<div className="flex flex-col items-center justify-center text-center text-zinc-300">
 					<h1 className="text-xl px-6">
 						Select a start and end user.
+					</h1>
+					<h1 className="text-lg px-6 text-zinc-600">
+						Currently in beta, some things
+						may break.
 					</h1>
 				</div>
 			</>

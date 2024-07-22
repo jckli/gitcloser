@@ -189,7 +189,9 @@ export default function Pathway() {
 
 	return (
 		<>
-			<div className="md:h-[80vh] flex flex-col justify-center">
+			<div
+				className={`${jsonRef.current && "md:h-[80vh]"} flex flex-col justify-center`}
+			>
 				<div className="w-full flex flex-col items-center justify-center text-3xl font-lexend text-zinc-300">
 					<Dialog
 						open={open}
@@ -269,7 +271,7 @@ export default function Pathway() {
 													className={`absolute ${error ? "top-[215px]" : "top-[195px]"} bg-ender-black border-[1px] border-white/10 rounded-lg text-zinc-300 sm:w-[375px] font-lexend`}
 												>
 													{searchResults.length >
-														0 ? (
+													0 ? (
 														searchResults.map(
 															(
 																user,
@@ -353,7 +355,7 @@ export default function Pathway() {
 													className={`absolute ${error ? "top-[300px]" : "top-[280px]"} bg-ender-black border-[1px] border-white/10 rounded-lg text-zinc-300 sm:w-[375px] font-lexend`}
 												>
 													{searchResults.length >
-														0 ? (
+													0 ? (
 														searchResults.map(
 															(
 																user,
