@@ -192,7 +192,7 @@ export default function Pathway() {
 	return (
 		<>
 			<div
-				className={`${jsonRef.current && "md:h-[80svh]"} flex flex-col justify-center`}
+				className={`${jsonRef.current && "md:h-[80svh]"} flex flex-col justify-center h-full`}
 			>
 				<div className="w-full flex flex-col items-center justify-center text-3xl font-lexend text-zinc-300">
 					<Dialog

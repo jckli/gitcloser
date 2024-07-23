@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Head />
       <body className="min-h-svh flex flex-col">
         <Header />
-        <div className="flex flex-col flex-grow justify-center">{children}</div>
+        <div className="flex flex-col flex-grow">{children}</div>
         <Footer />
       </body>
     </html>
