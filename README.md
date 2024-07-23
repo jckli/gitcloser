@@ -8,7 +8,7 @@ _**Git** as in the version control system "Git" & **Closer** as in "how close on
 
 GitCloser is a web application that makes it super easy to find out how close you are to another GitHub user. It utilizes a Bidirectional Breadth First Search (BFS) algorithm to find the (mostly shortest) path between two users on GitHub. Implemented in Go with go routines for concurrency, the algorithm takes around 20 seconds or less for most users on GitHub.
 
-You can try it out at [gitcloser.hayasaka.moe](https://gitcloser.hayasaka.moe) without deploying anything youself - just type in two GitHub usernames and click "Find Path"! If you want to self host it though, it'll take a bit of configuration.
+You can try it out at [gitcloser.hayasaka.moe](https://gitcloser.hayasaka.moe) without deploying anything yourself - just type in two GitHub usernames and click "Find Path"! If you want to self host it though, it'll take a bit of configuration.
 
 ## Self-hosting
 
