@@ -1,9 +1,11 @@
 "use client";
 
-import {
-	SecondaryButton,
-	SmallerSecondaryButton,
-} from "@/components/SecondaryButton";
+import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+
+import useDebounce from "@/hooks/useDebounce";
+import useWebSocket from "@/hooks/useWebsocket";
+
 import {
 	Dialog,
 	DialogContent,
@@ -13,12 +15,12 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/Dialog";
+import {
+	SecondaryButton,
+	SmallerSecondaryButton,
+} from "@/components/SecondaryButton";
 import { Input } from "@/components/ui/Input";
-import useWebSocket from "@/hooks/useWebsocket";
-import { useState, useRef, useEffect } from "react";
 import { PathwayVisualization } from "@/components/Pathway";
-import useDebounce from "@/hooks/useDebounce";
-import Image from "next/image";
 
 type User = {
 	login: string;
@@ -190,7 +192,7 @@ export default function Pathway() {
 	return (
 		<>
 			<div
-				className={`${jsonRef.current && "md:h-[80vh]"} flex flex-col justify-center`}
+				className={`${jsonRef.current && "md:h-[80svh]"} flex flex-col justify-center h-full`}
 			>
 				<div className="w-full flex flex-col items-center justify-center text-3xl font-lexend text-zinc-300">
 					<Dialog
