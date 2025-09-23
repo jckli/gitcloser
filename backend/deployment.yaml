@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitcloser-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitcloser-api
+  template:
+    metadata:
+      labels:
+        app: gitcloser-api
+    spec:
+      containers:
+      - name: gitcloser-api
+        image: jckli/gitcloser-api:latest
+        ports:
+        - containerPort: 8080 
+        env:
+        - name: PORT
+          value: "8080"
+        envFrom:
+        - secretRef:
+            name: gitcloser-api-secrets
+
+
